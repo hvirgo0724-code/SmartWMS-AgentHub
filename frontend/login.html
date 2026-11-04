@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>登录 - 智能仓储管理系统</title>
+  <link rel="stylesheet" href="/static/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/style.css?v=16">
+</head>
+<body class="login-body">
+
+  <!-- 视频背景层 -->
+  <div class="video-bg" aria-hidden="true">
+    <video autoplay muted loop playsinline preload="auto" src="/static/video/login-bg.mp4"></video>
+  </div>
+  <!-- 遮罩层：保证卡片可读性 -->
+  <div class="video-overlay" aria-hidden="true"></div>
+
+  <div class="login-wrap">
+    <div class="login-card card shadow-lg">
+      <div class="card-body p-4 p-md-5">
+        <div class="text-center mb-4">
+          <div class="login-brand">
+            <div class="login-brand-icon">📦</div>
+            <div class="text-start ms-1">
+              <div class="login-brand-name">智能仓储管理系统</div>
+              <div class="login-brand-sub">Smart Warehouse Management System</div>
+            </div>
+          </div>
+        </div>
+
+        <div id="loginForm">
+          <ul class="nav nav-pills nav-justified mb-3">
+            <li class="nav-item"><a class="nav-link active" data-bs-toggle="pill" href="#pwdTab">账号登录</a></li>
+            <li class="nav-item"><a class="nav-link" data-bs-toggle="pill" href="#smsTab">短信登录</a></li>
+          </ul>
+          <div class="tab-content">
+            <div class="tab-pane fade show active" id="pwdTab">
+              <div class="mb-3">
+                <label class="form-label">用户名</label>
+                <input type="text" class="form-control" id="username" placeholder="请输入用户名" value="admin">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">密码</label>
+                <input type="password" class="form-control" id="password" placeholder="请输入密码">
+              </div>
+              <div class="d-grid mb-3">
+                <button class="btn btn-primary btn-lg" id="btnLogin" onclick="doLogin()">登 录</button>
+              </div>
+            </div>
+            <div class="tab-pane fade" id="smsTab">
+              <div class="mb-3">
+                <label class="form-label">手机号</label>
+                <input type="text" class="form-control" id="smsPhone" placeholder="请输入账号绑定的手机号">
+              </div>
+              <div class="mb-3">
+                <label class="form-label">验证码</label>
+                <div class="d-flex gap-2">
+                  <input type="text" class="form-control" id="smsCode" placeholder="6位验证码" maxlength="6">
+                  <button class="btn btn-outline-secondary text-nowrap" id="smsLoginCodeBtn" onclick="sendLoginSmsCode()">获取验证码</button>
+                </div>
+              </div>
+              <div class="d-grid mb-3">
+                <button class="btn btn-primary btn-lg" onclick="doSmsLogin()">验证码登录</button>
+              </div>
+            </div>
+          </div>
+          <div class="text-center mb-2">
+            <a href="javascript:void(0)" onclick="showForgot()">忘记密码？</a>
+          </div>
+          <div class="text-center">
+            <a href="javascript:void(0)" onclick="toggleRegister(true)">没有账号？注册新用户</a>
+          </div>
+          <div class="demo-accounts">
+            <div class="demo-accounts-title">演示账号 · 点击自动填入</div>
+            <div class="demo-grid">
+              <button type="button" class="demo-chip demo-chip-admin" onclick="fillDemo('admin','admin123')" title="admin / admin123 · 全部权限">
+                <span class="demo-chip-icon">👑</span>
+                <span class="demo-chip-body">
+                  <span class="demo-chip-role">系统管理员</span>
+                  <span class="demo-chip-user">admin / admin123</span>
+                </span>
+              </button>
+              <button type="button" class="demo-chip" onclick="fillDemo('zhangwei','123456')" title="zhangwei / 123456 · 员工账号">
+                <span class="demo-chip-icon">👷</span>
+                <span class="demo-chip-body">
+                  <span class="demo-chip-role">员工</span>
+                  <span class="demo-chip-user">zhangwei / 123456</span>
+                </span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div id="forgotForm" style="display:none">
+          <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input type="text" class="form-control" id="fgUsername" placeholder="请输入用户名">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">绑定手机号</label>
+            <input type="text" class="form-control" id="fgPhone" placeholder="请输入该账号绑定的手机号">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">验证码</label>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control" id="fgCode" placeholder="6位验证码" maxlength="6">
+              <button class="btn btn-outline-secondary text-nowrap" id="fgCodeBtn" onclick="sendForgotCode()">获取验证码</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">新密码（至少6位）</label>
+            <input type="password" class="form-control" id="fgNewPwd" placeholder="请输入新密码">
+          </div>
+          <div class="d-grid mb-2">
+            <button class="btn btn-primary btn-lg" onclick="doForgotReset()">重置密码</button>
+          </div>
+          <div class="text-center mb-2">
+            <a href="javascript:void(0)" onclick="doForgotApply()">收不到验证码？向管理员申请重置</a>
+          </div>
+          <div class="text-center">
+            <a href="javascript:void(0)" onclick="showForgot(false)">返回登录</a>
+          </div>
+        </div>
+
+        <div id="registerForm" style="display:none">
+          <div class="mb-3">
+            <label class="form-label">用户名</label>
+            <input type="text" class="form-control" id="regUsername" placeholder="请输入用户名">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">姓名</label>
+            <input type="text" class="form-control" id="regRealName" placeholder="请输入真实姓名">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">身份证号</label>
+            <input type="text" class="form-control" id="regIdCard" placeholder="请输入18位身份证号" maxlength="18">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">手机号</label>
+            <input type="text" class="form-control" id="regPhone" placeholder="请输入11位手机号" maxlength="11">
+          </div>
+          <div class="mb-3">
+            <label class="form-label">验证码</label>
+            <div class="d-flex gap-2">
+              <input type="text" class="form-control" id="regCode" placeholder="6位验证码" maxlength="6">
+              <button class="btn btn-outline-secondary text-nowrap" id="regCodeBtn" onclick="sendRegCode()">获取验证码</button>
+            </div>
+          </div>
+          <div class="mb-3">
+            <label class="form-label">密码</label>
+            <input type="password" class="form-control" id="regPassword" placeholder="请输入密码（至少6位）">
+          </div>
+          <div class="d-grid mb-3">
+            <button class="btn btn-success btn-lg" onclick="doRegister()">注 册</button>
+          </div>
+          <div class="text-center">
+            <a href="javascript:void(0)" onclick="toggleRegister(false)">已有账号？返回登录</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/static/vendor/bootstrap.bundle.min.js?v=12"></script>
+  <script src="/static/js/api.js?v=12"></script>
+  <script>
+    if (localStorage.getItem('token')) { location.href = '/app'; }
+
+    function toggleRegister(show) {
+      document.getElementById('loginForm').style.display = show ? 'none' : '';
+      document.getElementById('registerForm').style.display = show ? '' : 'none';
+      if (show) document.getElementById('forgotForm').style.display = 'none';
+    }
+
+    // 演示账号：一键填入用户名密码（若在短信/注册/找回页签，自动切回账号登录）
+    function fillDemo(username, password) {
+      document.getElementById('loginForm').style.display = '';
+      document.getElementById('registerForm').style.display = 'none';
+      document.getElementById('forgotForm').style.display = 'none';
+      const pwdTab = document.querySelector('a[href="#pwdTab"]');
+      if (pwdTab && !pwdTab.classList.contains('active')) pwdTab.click();
+      const u = document.getElementById('username');
+      const p = document.getElementById('password');
+      u.value = username;
+      p.value = password;
+      u.classList.remove('demo-flash'); p.classList.remove('demo-flash');
+      void u.offsetWidth; // 重新触发动画
+      u.classList.add('demo-flash'); p.classList.add('demo-flash');
+      p.focus();
+    }
+
+    function showForgot(show = true) {
+      document.getElementById('loginForm').style.display = show ? 'none' : '';
+      document.getElementById('forgotForm').style.display = show ? '' : 'none';
+    }
+
+    function startCountdown(btn, seconds = 60) {
+      btn.disabled = true;
+      let left = seconds;
+      const t = setInterval(() => {
+        btn.textContent = left > 0 ? `${left--}s 后重发` : '获取验证码';
+        if (left <= 0) { clearInterval(t); btn.disabled = false; }
+      }, 1000);
+    }
+
+    async function sendLoginSmsCode() {
+      const phone = document.getElementById('smsPhone').value.trim();
+      if (!phone) return alert('请输入手机号');
+      const btn = document.getElementById('smsLoginCodeBtn');
+      const res = await API.post('/auth/sms-login-code', { phone });
+      if (res.code !== 0) return alert(res.msg);
+      alert(`验证码已发送：${res.data.code}（演示环境直接显示）`);
+      startCountdown(btn);
+    }
+
+    async function doSmsLogin() {
+      const phone = document.getElementById('smsPhone').value.trim();
+      const code = document.getElementById('smsCode').value.trim();
+      if (!phone || !code) return alert('请输入手机号和验证码');
+      const res = await API.post('/auth/login-by-sms', { phone, code });
+      if (res.code === 0) {
+        localStorage.setItem('token', res.data.token);
+        localStorage.setItem('user', JSON.stringify(res.data.user));
+        location.href = '/app';
+      } else alert(res.msg);
+    }
+
+    async function sendForgotCode() {
+      const username = document.getElementById('fgUsername').value.trim();
+      const phone = document.getElementById('fgPhone').value.trim();
+      if (!username || !phone) return alert('请输入用户名和绑定手机号');
+      const btn = document.getElementById('fgCodeBtn');
+      const res = await API.post('/auth/forgot-code', { username, phone });
+      if (res.code !== 0) return alert(res.msg);
+      alert(`验证码已发送：${res.data.code}（演示环境直接显示）`);
+      startCountdown(btn);
+    }
+
+    async function doForgotReset() {
+      const username = document.getElementById('fgUsername').value.trim();
+      const phone = document.getElementById('fgPhone').value.trim();
+      const code = document.getElementById('fgCode').value.trim();
+      const new_password = document.getElementById('fgNewPwd').value;
+      if (!username || !phone || !code) return alert('请填写完整');
+      if (new_password.length < 6) return alert('新密码至少6位');
+      const res = await API.post('/auth/forgot-reset', { username, phone, code, new_password });
+      if (res.code === 0) { alert('密码重置成功，请使用新密码登录'); showForgot(false); }
+      else alert(res.msg);
+    }
+
+    async function doForgotApply() {
+      const username = document.getElementById('fgUsername').value.trim();
+      const phone = document.getElementById('fgPhone').value.trim();
+      if (!username || !phone) return alert('请先填写用户名和绑定手机号（用于身份验证）');
+      if (!confirm('确定向管理员申请重置密码吗？\n管理员审核通过后，您的密码将重置为 123456')) return;
+      const res = await API.post('/auth/forgot-apply', { username, phone });
+      alert(res.msg);
+    }
+
+    async function doLogin() {
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+      if (!username || !password) return alert('请输入用户名和密码');
+      const btn = document.getElementById('btnLogin');
+      btn.disabled = true; btn.textContent = '登录中...';
+      try {
+        const res = await API.post('/auth/login', { username, password });
+        if (res.code === 0) {
+          localStorage.setItem('token', res.data.token);
+          localStorage.setItem('user', JSON.stringify(res.data.user));
+          location.href = '/app';
+        } else {
+          alert(res.msg); btn.disabled = false; btn.textContent = '登 录';
+        }
+      } catch (e) {
+        alert('网络错误：' + e.message); btn.disabled = false; btn.textContent = '登 录';
+      }
+    }
+
+    // 身份证号校验位验证（18位，末位可为 X）
+    function isValidIdCard(v) {
+      if (!/^\d{17}[\dXx]$/.test(v)) return false;
+      const weights = [7, 9, 10, 5, 8, 4, 2, 1, 6, 3, 7, 9, 10, 5, 8, 4, 2];
+      const codes = '10X98765432';
+      let s = 0;
+      for (let i = 0; i < 17; i++) s += Number(v[i]) * weights[i];
+      return codes[s % 11] === v[17].toUpperCase();
+    }
+
+    async function sendRegCode() {
+      const phone = document.getElementById('regPhone').value.trim();
+      if (!/^1\d{10}$/.test(phone)) return alert('请先输入正确的11位手机号');
+      const btn = document.getElementById('regCodeBtn');
+      const res = await API.post('/auth/register-code', { phone });
+      if (res.code !== 0) return alert(res.msg);
+      alert(`验证码已发送：${res.data.code}（演示环境直接显示）`);
+      startCountdown(btn);
+    }
+
+    async function doRegister() {
+      const username = document.getElementById('regUsername').value.trim();
+      const real_name = document.getElementById('regRealName').value.trim();
+      const id_card = document.getElementById('regIdCard').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const code = document.getElementById('regCode').value.trim();
+      const password = document.getElementById('regPassword').value;
+      if (!username || !real_name || password.length < 6) return alert('请填写完整（密码至少6位）');
+      if (!isValidIdCard(id_card)) return alert('身份证号格式不正确（18位，请核对校验位）');
+      if (!/^1\d{10}$/.test(phone)) return alert('手机号格式不正确');
+      if (!code) return alert('请输入短信验证码');
+      const res = await API.post('/auth/register', { username, password, real_name, id_card, phone, code });
+      if (res.code === 0) { alert('注册成功，请登录'); toggleRegister(false); }
+      else alert(res.msg);
+    }
+
+    document.getElementById('password').addEventListener('keydown', e => { if (e.key === 'Enter') doLogin(); });
+
+    // 减弱动画偏好：暂停视频背景
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      document.querySelector('.video-bg video')?.pause();
+    }
+  </script>
+</body>
+</html>

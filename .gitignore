@@ -1,0 +1,42 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.venv/
+venv/
+
+# IDE / local agent workspace
+.idea/
+.vscode/
+.workbuddy/
+.screenshots/
+output/
+
+# Runtime data and logs
+logs/
+*.log
+*.db
+*.sqlite3
+*.sql.gz
+
+# Secrets
+.env
+.env.*
+!.env.example
+
+# Node
+node_modules/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Large local media
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# Office temp files
+~$*

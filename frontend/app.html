@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能仓储管理系统</title>
+  <link rel="stylesheet" href="/static/vendor/bootstrap.min.css">
+  <link rel="stylesheet" href="/static/css/style.css?v=18">
+</head>
+<body>
+  <!-- 侧边栏 -->
+  <nav class="app-sidebar" id="sidebar">
+    <div class="brand"><span class="brand-logo">📦</span> 智能仓储管理</div>
+    <div id="menuNav"></div>
+  </nav>
+
+  <!-- 主区域 -->
+  <div class="app-main">
+    <header class="app-header">
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm btn-light d-lg-none" onclick="document.getElementById('sidebar').classList.toggle('show')">☰</button>
+        <span class="page-title fw-semibold" id="pageTitle">首页</span>
+      </div>
+      <div class="d-flex align-items-center gap-3">
+        <button class="btn btn-sm btn-outline-primary" onclick="loadPage('service')">💬 智能客服</button>
+        <button class="btn btn-sm btn-outline-primary" onclick="loadPage('alerts')">🔔 消息预警</button>
+        <div class="dropdown">
+          <button class="btn btn-light btn-sm dropdown-toggle" data-bs-toggle="dropdown">
+            👤 <span id="userName"></span>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end">
+            <li><a class="dropdown-item" href="javascript:showProfile()">👤 个人中心</a></li>
+            <li><a class="dropdown-item" href="javascript:showChangePwd()">🔑 修改密码</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item text-danger" href="javascript:doLogout()">🚪 退出登录</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+    <main class="app-content" id="content"></main>
+  </div>
+
+  <button class="cs-fab" onclick="loadPage('service')" title="打开智能客服">
+    <span>🤖</span><i class="cs-fab-dot"></i>
+  </button>
+
+  <script src="/static/vendor/bootstrap.bundle.min.js"></script>
+  <script src="/static/vendor/echarts.min.js"></script>
+  <script src="/static/js/api.js?v=9"></script>
+  <script src="/static/js/ui.js?v=10"></script>
+  <script src="/static/js/pages/base.js?v=9"></script>
+  <script src="/static/js/pages/inbound.js?v=9"></script>
+  <script src="/static/js/pages/outbound.js?v=9"></script>
+  <script src="/static/js/pages/inventory.js?v=9"></script>
+  <script src="/static/js/pages/decision.js?v=13"></script>
+  <script src="/static/js/pages/system.js?v=9"></script>
+  <script src="/static/js/pages/service.js?v=6"></script>
+  <script src="/static/js/pages/scan.js?v=2"></script>
+  <script src="/static/js/app.js?v=17"></script>
+</body>
+</html>

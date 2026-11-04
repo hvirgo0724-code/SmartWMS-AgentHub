@@ -1,0 +1,53 @@
+# 智能仓储管理系统 - 一键容器化部署
+# 使用: docker compose up -d --build
+# 访问: http://localhost:8000  (admin / admin123)
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: wms-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: "123456"
+      MYSQL_DATABASE: warehouse_management_system01
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    ports:
+      - "3306:3306"
+    volumes:
+      - wms-mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-p123456"]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+
+  backend:
+    build:
+      context: .              # 构建上下文为项目根目录（Dockerfile 需同时复制 backend 与 frontend）
+      dockerfile: Dockerfile
+    container_name: wms-backend
+    restart: unless-stopped
+    environment:
+      WMS_DB_HOST: mysql
+      WMS_DB_PORT: 3306
+      WMS_DB_USER: root
+      WMS_DB_PASSWORD: "123456"
+      WMS_DB_NAME: warehouse_management_system01
+      WMS_JWT_SECRET: wms-secret-key-2026-smart-warehouse
+      TZ: Asia/Shanghai
+    ports:
+      - "8000:8000"
+    depends_on:
+      mysql:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/', timeout=3)"]
+      interval: 15s
+      timeout: 5s
+      retries: 10
+      start_period: 60s      # 预留首次启动自动初始化数据库的时间
+
+volumes:
+  wms-mysql-data:
