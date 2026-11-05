@@ -1,4 +1,4 @@
-"""智能仓储管理系统 WMS - FastAPI 后端入口"""
+"""智仓云枢（SmartWMS AgentHub）- FastAPI 后端入口"""
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse, JSONResponse
@@ -10,8 +10,8 @@ from config import FRONTEND_DIR
 from database import get_conn
 from routers import auth, sysmgmt, basedata, inbound, outbound, inventory, analytics, system, cs, scan
 
-app = FastAPI(title="智能仓储管理系统 WMS", version="2.0.0",
-              description="前后端分离智能仓储管理系统：入库/出库/库存/盘点/智能决策全流程联动 + RAG 多 Agent 智能客服")
+app = FastAPI(title="智仓云枢（SmartWMS AgentHub）", version="2.0.0",
+              description="基于 RAG 与多 Agent 的仓储运营智能协同平台：入库/出库/库存/盘点/智能决策全流程联动 + RAG 多 Agent 智能客服")
 
 
 @app.on_event("startup")

@@ -419,7 +419,7 @@ def _llm_answer(query, history, hits, results, slots, user, session):
     ) or "（无业务数据查询结果）"
     hist_text = "\n".join(f"{'用户' if m['role'] == 'user' else '客服'}：{m['content'][:120]}"
                           for m in history[-6:])
-    system = f"""你是智能仓储管理系统（Smart WMS）的智能客服，服务对象是本系统用户与供应商。
+    system = f"""你是智仓云枢（SmartWMS AgentHub）的智能客服，服务对象是本系统用户与供应商。
 当前用户：{user.get('real_name') or user.get('username')}，角色：{'、'.join(user.get('roles', [])) or '普通用户'}。
 当前系统时间：{datetime.now().strftime('%Y-%m-%d %H:%M:%S %A')}。
 工作准则：
@@ -444,7 +444,7 @@ def _llm_answer(query, history, hits, results, slots, user, session):
 
 def _llm_general_answer(query, history, user, kind):
     now = datetime.now()
-    system = f"""你是智能仓储管理系统（Smart WMS）的智能助手，当前用户：{user.get('real_name') or user.get('username')}。
+    system = f"""你是智仓云枢（SmartWMS AgentHub）的智能助手，当前用户：{user.get('real_name') or user.get('username')}。
 当前系统时间：{now.strftime('%Y-%m-%d %H:%M:%S')}（星期{WEEK_CN[now.weekday()]}，系统本地时区）。
 你可以回答日期时间、算术、常识、翻译、寒暄等通用问题，回答简洁自然，中文，200 字以内。
 约束：

@@ -1,6 +1,8 @@
-# SmartWMS-AgentHub · 智能仓储管理系统
+# 智仓云枢（SmartWMS AgentHub）
 
-覆盖 **入库 → 出库 → 库存 → 盘点 → 智能决策 → 智能客服** 全流程的开源仓储管理系统。前后端分离架构，业务数据实时联动，内置 RBAC 权限体系、基于 RAG 的 6 Agent 智能客服、人工接管、扫码作业与供应商开放接口，配套 87 项端到端测试。采用 [MIT 协议](LICENSE) 开源。
+基于 RAG 与多 Agent 的仓储运营智能协同平台，覆盖 **入库 → 出库 → 库存 → 盘点 → 智能决策 → 智能客服** 全流程。前后端分离架构，业务数据实时联动，内置 RBAC 权限体系、6 Agent 智能客服、人工接管、扫码作业与供应商开放接口，配套 87 项端到端测试。采用 [MIT 协议](LICENSE) 开源。
+
+仓库地址：<https://github.com/hvirgo0724-code/SmartWMS-AgentHub>
 
 ***
 
@@ -375,7 +377,7 @@ python test_e2e.py
 ```
 ├── README.md                 # 项目说明
 ├── LICENSE                   # MIT 开源协议
-├── 智能仓储管理系统项目开发大纲.md  # 开发文档（架构 / 模块 / 库表 / API）
+├── 智仓云枢项目开发大纲.md      # 开发文档（架构 / 模块 / 库表 / API）
 ├── docker-compose.yml        # 一键部署：MySQL + 后端双容器
 ├── Dockerfile                # 后端镜像（含前端静态资源）
 ├── backend/
