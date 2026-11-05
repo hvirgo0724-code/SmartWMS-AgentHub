@@ -1,4 +1,4 @@
-# 智能仓储管理系统 - 一键容器化部署
+# 智仓云枢（SmartWMS AgentHub）- 一键容器化部署
 # 使用: docker compose up -d --build
 # 访问: http://localhost:8000  (admin / admin123)
 services:

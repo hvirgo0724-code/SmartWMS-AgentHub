@@ -4,7 +4,7 @@
 *.pyc
 *.log
 README.md
-智能仓储管理系统项目开发大纲.md
+智仓云枢项目开发大纲.md
 docker-compose.yml
 # 根目录演示视频（frontend/video/login-bg.mp4 不受影响，会正常打入镜像）
 /70661c516548f2e6746435f5767ca87b.mp4

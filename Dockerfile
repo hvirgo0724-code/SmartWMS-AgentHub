@@ -1,4 +1,4 @@
-# 智能仓储管理系统 - 后端镜像
+# 智仓云枢（SmartWMS AgentHub）- 后端镜像
 # 构建上下文为项目根目录（见 docker-compose.yml 的 context 设置）
 FROM python:3.14-slim
 
