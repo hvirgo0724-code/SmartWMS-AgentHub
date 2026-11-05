@@ -1,6 +1,6 @@
-# 智能仓储管理系统（Smart WMS）
+# SmartWMS-AgentHub · 智能仓储管理系统
 
-覆盖 **入库 → 出库 → 库存 → 盘点 → 智能决策 → 智能客服** 全流程的仓储管理系统。前后端分离架构，所有业务操作数据实时联动，内置 RBAC 权限体系、基于 RAG 的多 Agent 智能客服、供应商开放接口与端到端测试（69 项断言全部通过）。
+覆盖 **入库 → 出库 → 库存 → 盘点 → 智能决策 → 智能客服** 全流程的开源仓储管理系统。前后端分离架构，业务数据实时联动，内置 RBAC 权限体系、基于 RAG 的 6 Agent 智能客服、人工接管、扫码作业与供应商开放接口，配套 87 项端到端测试。采用 [MIT 协议](LICENSE) 开源。
 
 ***
 
@@ -48,18 +48,21 @@
 
 ## 架构总览
 
-```
-┌─────────────┐     HTTP/SSE       ┌────────────────────────┐    PyMySQL    ┌─────────┐
-│   浏览器     │ ─────────────────▶ │  FastAPI 后端           │ ──────────────▶ │ MySQL 8 │
-│  login.html │   token: <JWT>    │  静态资源托管 / RBAC     │   事务+原生SQL  │         │
-│   app.html   │ ◀───────────────── │  /api/v1/* 业务路由      │ ◀───────────── │         │
-└─────────────┘   统一响应格式      │  智能客服多 Agent 编排    │                └─────────┘
-                                  │  ├ RouterAgent          │
-                                  │  ├ KnowledgeAgent(RAG)  │◀── 知识库切片/向量
-                                  │  ├ BusinessAgent(工具)  │◀── 实时库存/单据/预警
-                                  │  ├ SupplierAgent        │◀── 供应商履约/补货清单
-                                  │  └ TicketAgent          │──▶ 人工工单
-                                  └────────────────────────┘
+```mermaid
+flowchart LR
+  U["浏览器<br/>login.html / app.html"] -->|"HTTP · SSE · JWT"| API["FastAPI 后端<br/>静态资源托管 · RBAC · /api/v1"]
+  API --> DB[("MySQL 8<br/>事务 + 原生 SQL")]
+  API --> R["RouterAgent<br/>意图路由 + 实体抽取"]
+  R --> K["KnowledgeAgent<br/>BM25 + 哈希向量召回"]
+  R --> BIZ["BusinessAgent<br/>只读业务工具"]
+  R --> SUP["SupplierAgent<br/>履约画像 / 补货清单"]
+  R --> GEN["GeneralAgent<br/>日期 / 算术 / 天气 / 翻译"]
+  R --> T["TicketAgent<br/>工单 / 人工接管"]
+  K --> KB[("kb_document / kb_chunk")]
+  BIZ --> DB
+  SUP --> DB
+  T --> HUMAN["人工坐席工作台<br/>SSE 双向实时会话"]
+  SUP --> PARTNER["供应商开放接口<br/>X-Partner-Key"]
 ```
 
 - 后端同时托管前端静态资源（`/static`），单服务部署，无需 Nginx。
@@ -96,7 +99,7 @@ ASN 收货通知 → 转入库单（自动生成批次）→ 审核 → 确认�
 
 数据看板（库存周转、库容利用率、出入库 14 天趋势、ABC 分类）、智能补货建议（近 30 天出库速度 + 安全库存）、上下限 / 滞销 / 缺货预警、路径优化（库位热力图 + 最近邻 + 2-opt）、报表中心（Excel 导出）。
 
-### 智能客服（新增）
+### 智能客服
 
 基于 RAG 的知识问答 + 多 Agent 协作，深度融合现有 WMS 数据：
 
@@ -113,7 +116,7 @@ ASN 收货通知 → 转入库单（自动生成批次）→ 审核 → 确认�
 
 ### 系统管理
 
-系统参数配置、操作日志审计、消息中心。
+系统参数与 AI 大模型配置、操作日志审计。
 
 ***
 
@@ -370,6 +373,9 @@ python test_e2e.py
 ## 项目结构
 
 ```
+├── README.md                 # 项目说明
+├── LICENSE                   # MIT 开源协议
+├── 智能仓储管理系统项目开发大纲.md  # 开发文档（架构 / 模块 / 库表 / API）
 ├── docker-compose.yml        # 一键部署：MySQL + 后端双容器
 ├── Dockerfile                # 后端镜像（含前端静态资源）
 ├── backend/
@@ -380,7 +386,7 @@ python test_e2e.py
 │   ├── deps.py               # 认证与 RBAC 权限依赖
 │   ├── services.py           # 核心业务（入库确认/FIFO分配/发货/盘点联动）
 │   ├── init_db.sql           # 建库建表脚本（38 张表，含智能客服/扫码日志）
-│   ├── seed_data.py          # 演示数据初始化（约 1500+ 条，含 ASN）
+│   ├── seed_data.py          # 演示数据初始化（约 1400+ 条，含 ASN）
 │   ├── test_e2e.py           # 端到端 API 测试（87 项）
 │   ├── docker-entrypoint.sh  # 容器启动：等库就绪 + 自动初始化
 │   ├── agents/               # 智能客服多 Agent
@@ -424,8 +430,8 @@ POST /api/v1/auth/login                  登录
 GET  /api/v1/auth/me                     当前用户信息
 GET  /api/v1/warehouses                  仓库/库区/库位/商品/供应商/客户 CRUD
 GET  /api/v1/inventory                   实时库存（多维过滤 + 汇总）
-POST /api/v1/asns                        创建 ASN 收货通知
-POST /api/v1/asns/{id}/to-inbound        ASN 转入库单（自动生成批次）
+POST /api/v1/asn                        创建 ASN 收货通知
+POST /api/v1/asn/{id}/to-inbound        ASN 转入库单（自动生成批次）
 POST /api/v1/inbound-orders              创建入库单
 POST /api/v1/inbound-orders/{id}/confirm 确认入库（联动库存/批次/库位/质检）
 POST /api/v1/outbound-orders            创建出库单（库存预检）
@@ -435,8 +441,8 @@ POST /api/v1/waves                       创建波次（多订单合并拣货）
 POST /api/v1/check-orders                创建盘点单
 POST /api/v1/check-orders/{id}/submit    提交盘点（差异联动调整）
 GET  /api/v1/analytics/dashboard         数据看板 KPI/趋势/图表
-GET  /api/v1/alerts/scan                 预警扫描
-GET  /api/v1/replenishment/suggestions    智能补货建议
+GET  /api/v1/alerts                      预警扫描与列表
+POST /api/v1/replenishment/suggest       生成智能补货建议
 GET  /api/v1/reports/{type}/export       报表 Excel 导出
 POST /api/v1/cs/chat                     智能客服问答（多 Agent + RAG）
 POST /api/v1/cs/chat/stream              智能客服 SSE 流式问答（Agent 轨迹）
@@ -476,4 +482,10 @@ GET  /api/v1/partner/supplier/{code}/scorecard 供应商履约画像
 - 知识库一致性：文档发布/编辑后在同一事务内重建切片与向量索引；转为草稿或删除时清理切片，检索缓存自动失效。
 
 - 客服只读约束：智能客服的业务工具均为只读查询，不会自动修改库存、单据或供应商数据；唯一写操作是用户明确要求时创建工单。
+
+## 开源协议
+
+本项目采用 [MIT License](LICENSE) 开源，可用于商业与非商业项目，保留版权与许可声明即可。
+
+欢迎提交 Issue 与 Pull Request。新增业务模块或 Agent 时，建议同步补充 [test_e2e.py](backend/test_e2e.py) 断言与内置知识库文档，保持测试与文档同步。
 
