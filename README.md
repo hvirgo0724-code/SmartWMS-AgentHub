@@ -124,7 +124,7 @@ ASN 收货通知 → 转入库单（自动生成批次）→ 审核 → 确认�
 
 ## 智能客服（RAG + 多 Agent）
 
-入口：「智能客服 → 客服工作台 / 服务工单 / 知识库管理」，或页面右下角悬浮客服按钮。
+入口：「智能客服 → 客服工作台 / 人工工作台 / 服务工单 / 知识库管理」，或页面右下角悬浮客服按钮。
 
 ### 协作流程
 
@@ -347,6 +347,8 @@ python -m uvicorn main:app --host 127.0.0.1 --port 8000
 | WMS\_PARTNER\_KEY | wms-partner-demo-key                | 供应商开放接口密钥（生产环境务必修改） |
 | WMS\_KB\_TOP\_K   | 6                                   | RAG 默认召回切片数 |
 | WMS\_KB\_MIN\_SCORE | 0.18                              | 召回最低融合分数 |
+| WMS\_KB\_CHUNK\_SIZE | 320                              | 知识切片长度（字） |
+| WMS\_KB\_OVERLAP  | 60                                  | 切片重叠长度（字） |
 
 > 智能客服、人工接管、扫码作业相关表、索引、权限与内置知识库会在后端首次启动时自动创建（幂等），已有数据库无需手动迁移。
 
@@ -409,7 +411,7 @@ python test_e2e.py
 │       ├── analytics.py      # 看板/补货建议/预警/路径优化/报表导出
 │       ├── cs.py             # 智能客服/知识库/工单/供应商开放接口
 │       ├── scan.py           # 扫码识别/快捷移库/扫码入库发货/扫码日志
-│       └── system.py         # 系统参数/操作日志/消息
+│       └── system.py         # 系统参数/AI 大模型配置/操作日志
 └── frontend/
     ├── login.html            # 登录页（视频背景 + 演示账号一键填入）
     ├── app.html              # 主界面（SPA）
@@ -443,17 +445,30 @@ POST /api/v1/waves                       创建波次（多订单合并拣货）
 POST /api/v1/check-orders                创建盘点单
 POST /api/v1/check-orders/{id}/submit    提交盘点（差异联动调整）
 GET  /api/v1/analytics/dashboard         数据看板 KPI/趋势/图表
+GET  /api/v1/analytics/abc               ABC 分类
+GET  /api/v1/analytics/heatmap           库位热力图
+GET  /api/v1/analytics/pick-path         拣货路径优化（最近邻 + 2-opt）
 GET  /api/v1/alerts                      预警扫描与列表
+GET/PUT /api/v1/alert-rules              预警规则维护
 POST /api/v1/replenishment/suggest       生成智能补货建议
+POST /api/v1/replenishment/{id}/handle   补货建议处理流转
 GET  /api/v1/reports/{type}/export       报表 Excel 导出
+GET  /api/v1/cs/agents                   Agent 目录与知识库/大模型状态
+GET  /api/v1/cs/suggestions              推荐问题
+POST /api/v1/cs/sessions                 创建会话
+GET  /api/v1/cs/sessions                 我的客服会话
+GET  /api/v1/cs/sessions/{id}/messages   会话历史消息
 POST /api/v1/cs/chat                     智能客服问答（多 Agent + RAG）
 POST /api/v1/cs/chat/stream              智能客服 SSE 流式问答（Agent 轨迹）
-GET  /api/v1/cs/sessions                 我的客服会话
-GET  /api/v1/cs/kb                       知识库文档列表
-POST /api/v1/cs/kb                       新增知识（发布自动切片索引）
+POST /api/v1/cs/messages/{id}/feedback   答案反馈（有用 / 无用）
+GET/POST/PUT/DELETE /api/v1/cs/kb[/{id}] 知识库增删改查（发布自动切片索引）
+POST /api/v1/cs/kb/{id}/reindex          单篇重建切片索引
+POST /api/v1/cs/kb/reindex-all           全量重建索引
 POST /api/v1/cs/kb/search                知识检索测试
 GET  /api/v1/cs/stats                    客服运营统计
 GET  /api/v1/cs/tickets                  服务工单
+POST /api/v1/cs/tickets                  创建工单
+PUT  /api/v1/cs/tickets/{id}             更新工单（优先级 / 处理人）
 GET  /api/v1/cs/human/queue              人工工作台排队
 POST /api/v1/cs/tickets/{id}/accept      坐席接入会话
 POST /api/v1/cs/tickets/{id}/resolve     结束人工服务并恢复 AI
